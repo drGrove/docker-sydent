@@ -27,18 +27,19 @@ RUN set -ex \
         sqlite3 \
         libssl-dev \
         python-virtualenv \
-        libxslt1-dev
+        libxslt1-dev \
+        git \
+    && pip install --upgrade pip
 
 USER sydent
 WORKDIR /home/sydent/
 RUN set -ex\
-    pip install --upgrade pip ;\
-    pip install --upgrade setuptools; \
+    pip install --upgrade --user setuptools; \
+    git clone --single-branch --branch ${SYDENT_VERSION} https://github.com/matrix-org/sydent; \
+    cd sydent;
     pip install --user https://github.com/matrix-org/sydent/tarball/${SYDENT_VERSION};
 
 COPY --chown=sydent:sydent default.conf /home/sydent/sydent.conf
-
-VOLUME /home/sydent/data
 
 EXPOSE 8090
 CMD ["python", "-m", "sydent.sydent"]
